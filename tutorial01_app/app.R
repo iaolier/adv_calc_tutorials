@@ -33,33 +33,77 @@ plot.fourier.series = function(.T, .a0, .an.fun, .bn.fun, .t.range, .n.max = 10,
             .an.fun(n) * cos(2*pi*n*t/.T) + .bn.fun(n) * sin(2*pi*n*t/.T)
         }) %>% reduce(`+`)
     })
-    ft = ft + a0/2
+    ft = ft + .a0/2
     data.plot = tibble(time = t.vector, Ft = ft)
     ggplot(data = data.plot, aes(x = time, y = Ft)) + geom_line()
 }
 
 
-ui <- fluidPage(
-    textAreaInput("capt.func", "Insert expression for function f(t) here:", "", width = "1000px"),
-    numericInput("piece.range.from", "Piece range from:", -1),
-    numericInput("piece.range.to", "To:", 1),
-    sliderInput("pieces", label = "Pieces:",
-                min = -5, max = 5, value = c(-1,1), step = 1),
-    sliderInput("resolution", label = "Graph resolution:",
-                min = 20, max = 1000, value = 100, step = 20),
-    actionButton("go", "Go"),
-    plotOutput("plot")
-    
-    
+# ui <- fluidPage(
+#     titlePanel("Fourier analysis"),
+#     textAreaInput("capt.func", "Insert expression for function f(t) here:", "", width = "1000px"),
+#     numericInput("piece.range.from", "Piece range from:", -1),
+#     numericInput("piece.range.to", "To:", 1),
+#     sliderInput("pieces", label = "Pieces:",
+#                 min = -5, max = 5, value = c(-1,1), step = 1),
+#     sliderInput("resolution", label = "Graph resolution:",
+#                 min = 20, max = 1000, value = 100, step = 20),
+#     actionButton("go", "Go"),
+#     plotOutput("plot")
+#     
+#     
+# )
+
+ui <- navbarPage("Fourier analysis",
+    tabPanel("Piecewise functions",
+        textAreaInput("capt.func", "Insert expression for function f(t) here:", "function(t) t", width = "500px"),
+        numericInput("piece.range.from", "Piece range from:", -1),
+        numericInput("piece.range.to", "To:", 1),
+        sliderInput("pieces", label = "Pieces:",
+            min = -5, max = 5, value = c(-1,1), step = 1),
+        sliderInput("resolution", label = "Graph resolution:",
+            min = 20, max = 1000, value = 100, step = 20),
+        actionButton("go", "Go"),
+        plotOutput("plot.pw")
+    ),
+    tabPanel("Fourier series",
+        numericInput("fs.a0", "a0:", 0),
+        textAreaInput("fs.an", "Insert expression for an:", "function(n) 1/n", width = "500px"),
+        textAreaInput("fs.bn", "Insert expression for bn:", "function(n) 1/n", width = "500px"),
+        numericInput("fs.period", "Period (T):", 1),
+        numericInput("fs.trange.from", "t range from:", -1),
+        numericInput("fs.trange.to", "To:", 1),
+        sliderInput("fs.nmax", label = "maximum n:",
+            min = 1, max = 50, value = 1, step = 1),
+        sliderInput("fs.resolution", label = "Graph resolution:",
+            min = 20, max = 1000, value = 100, step = 20),
+        actionButton("fs.go", "Go"),
+        plotOutput("plot.fs")
+    )
 )
+
 server <- function(input, output) {
    piecewise.fncs <- eventReactive(input$go, {
        pw.fn = eval(parse(text = input$capt.func))
-        plot.piecewise.fnc(.piece.range = c(input$piece.range.from, input$piece.range.to), .FUN = pw.fn, .pieces = seq(input$pieces[1], input$pieces[2]), .resolution = input$resolution)
+        plot.piecewise.fnc(.piece.range = c(input$piece.range.from, input$piece.range.to), 
+                           .FUN = pw.fn, .pieces = seq(input$pieces[1], input$pieces[2]), 
+                           .resolution = input$resolution)
     })
     
-    output$plot <- renderPlot({
+    output$plot.pw <- renderPlot({
         piecewise.fncs()
+    })
+    
+    fs.fncs <- eventReactive(input$fs.go, {
+        fs.anfn = eval(parse(text = input$fs.an))
+        fs.bnfn = eval(parse(text = input$fs.bn))
+        plot.fourier.series(.T = input$fs.period, .a0 = input$fs.a0, 
+                            .an.fun = fs.anfn, .bn.fun = fs.bnfn, 
+                            .t.range = c(input$fs.trange.from, input$fs.trange.to), 
+                            .n.max = input$fs.nmax, .resolution = input$fs.resolution)
+    })
+    output$plot.fs <- renderPlot({
+        fs.fncs()
     })
 }
 
