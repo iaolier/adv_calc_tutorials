@@ -1,0 +1,73 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+Ft.func = function(t){
+  ifelse(t<0, 0, t)
+}
+
+plot.piecewise.fnc(.FUN = Ft.func, .piece.range = c(-2, 2), .pieces = c(-2,-1,0,1), .resolution = 101)
+
+```
+
+
+```{r}
+Ft.func2 = function(t){
+  t^2
+}
+
+plot.piecewise.fnc(.FUN = Ft.func2, .piece.range = c(-3, 3))
+```
+
+```{r}
+Ft.func3 = function(t){
+  ifelse(t<0, -t, 7)
+}
+
+plot.piecewise.fnc(.FUN = Ft.func3, .piece.range = c(-2, 2))
+```
+
+```{r}
+Ft.func4 = function(t){
+  ifelse(t<=-3, -t-3,
+         ifelse(t>-3 & t<=0, t+3,
+                ifelse(t>0 & t<=3, -2*t+3,
+                       t-6)))
+}
+
+plot.piecewise.fnc(.FUN = Ft.func4, .piece.range = c(-5, 8), .pieces = seq(-2,2))
+```
+
+
+
+```{r}
+Ft.func5 = function(t){
+  sin(t)
+}
+
+plot.piecewise.fnc(.FUN = Ft.func5, .piece.range = c(0, 2*pi), .pieces = 0)
+```
+
+$x^2$
+
+```{r}
+a0 = 1
+an.fn = function(n) {
+  ifelse(as.logical(n%%2), -4/(n^2*pi^2), 0)
+}
+
+bn.fn = function(n) {
+  2/(n*pi) * ifelse(as.logical(n%%2), 1, -1)
+}
+
+plot.fourier.series(.T = 4, .a0 = a0, .an.fun = an.fn, .bn.fun = bn.fn,
+                    .t.range = c(-4,4), .n.max = 20, .resolution = 300)
+
+
+
+```
+
