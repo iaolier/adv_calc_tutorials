@@ -40,7 +40,7 @@ plot.fourier.series = function(.T, .a0, .an.fun, .bn.fun, .t.range, .n.max = 10,
 
 
 ui <- fluidPage(
-    textAreaInput("caption", "Insert expression for function f(t) here:", "", width = "1000px"),
+    textAreaInput("capt.func", "Insert expression for function f(t) here:", "", width = "1000px"),
     numericInput("piece.range.from", "Piece range from:", -1),
     numericInput("piece.range.to", "To:", 1),
     sliderInput("pieces", label = "Pieces:",
@@ -48,16 +48,14 @@ ui <- fluidPage(
     sliderInput("resolution", label = "Graph resolution:",
                 min = 20, max = 1000, value = 100, step = 20),
     actionButton("go", "Go"),
-   # verbatimTextOutput("value"),
     plotOutput("plot")
     
     
 )
 server <- function(input, output) {
    piecewise.fncs <- eventReactive(input$go, {
-        plot.piecewise.fnc(.piece.range = c(input$piece.range.from, input$piece.range.to), .FUN = function(t){
-            ifelse(t<0, 0, t)
-        }, .pieces = seq(input$pieces[1], input$pieces[2]), .resolution = input$resolution)
+       pw.fn = eval(parse(text = input$capt.func))
+        plot.piecewise.fnc(.piece.range = c(input$piece.range.from, input$piece.range.to), .FUN = pw.fn, .pieces = seq(input$pieces[1], input$pieces[2]), .resolution = input$resolution)
     })
     
     output$plot <- renderPlot({
