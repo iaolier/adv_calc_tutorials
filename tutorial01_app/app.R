@@ -9,7 +9,7 @@
 
 library(shiny)
 library(tidyverse)
-
+ 
 plot.piecewise.fnc = function(.piece.range, .FUN, ..., .pieces = c(-1, 0, 1), .resolution = 101) {
     period = diff(.piece.range)  #FIXME: to throw an error if NEGATIVE
     repetitions = rep(.pieces * period, each = .resolution)
