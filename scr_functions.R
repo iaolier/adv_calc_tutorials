@@ -11,7 +11,7 @@ plot.piecewise.fnc = function(.piece.range, .FUN, ..., .pieces = c(-1, 0, 1), .r
   
   data.plot = tibble(time = t, Ft = Ft)
   
-  ggplot(data.plot, aes(x = time, y = Ft)) + geom_line()
+  ggplot(data.plot, aes(x = time, y = Ft)) + geom_line() + theme_classic()
 }
 
 plot.fourier.series = function(.T, .a0, .an.fun, .bn.fun, .t.range, .n.max = 10, .resolution = 101) {
@@ -25,5 +25,5 @@ plot.fourier.series = function(.T, .a0, .an.fun, .bn.fun, .t.range, .n.max = 10,
   })
   ft = ft + a0/2
   data.plot = tibble(time = t.vector, Ft = ft)
-  ggplot(data = data.plot, aes(x = time, y = Ft)) + geom_line()
+  ggplot(data = data.plot, aes(x = time, y = Ft)) + geom_line() + theme_classic()
 }

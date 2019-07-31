@@ -9,7 +9,7 @@
 
 library(shiny)
 library(tidyverse)
- 
+
 plot.piecewise.fnc = function(.piece.range, .FUN, ..., .pieces = c(-1, 0, 1), .resolution = 101) {
     period = diff(.piece.range)  #FIXME: to throw an error if NEGATIVE
     repetitions = rep(.pieces * period, each = .resolution)
@@ -21,7 +21,7 @@ plot.piecewise.fnc = function(.piece.range, .FUN, ..., .pieces = c(-1, 0, 1), .r
     
     data.plot = tibble(time = t, Ft = Ft)
     
-    ggplot(data.plot, aes(x = time, y = Ft)) + geom_line()
+    ggplot(data.plot, aes(x = time, y = Ft)) + geom_line() + theme_classic()
 }
 
 plot.fourier.series = function(.T, .a0, .an.fun, .bn.fun, .t.range, .n.max = 10, .resolution = 101) {
@@ -35,36 +35,24 @@ plot.fourier.series = function(.T, .a0, .an.fun, .bn.fun, .t.range, .n.max = 10,
     })
     ft = ft + .a0/2
     data.plot = tibble(time = t.vector, Ft = ft)
-    ggplot(data = data.plot, aes(x = time, y = Ft)) + geom_line()
+    ggplot(data = data.plot, aes(x = time, y = Ft)) + geom_line() + theme_classic()
 }
 
 
-# ui <- fluidPage(
-#     titlePanel("Fourier analysis"),
-#     textAreaInput("capt.func", "Insert expression for function f(t) here:", "", width = "1000px"),
-#     numericInput("piece.range.from", "Piece range from:", -1),
-#     numericInput("piece.range.to", "To:", 1),
-#     sliderInput("pieces", label = "Pieces:",
-#                 min = -5, max = 5, value = c(-1,1), step = 1),
-#     sliderInput("resolution", label = "Graph resolution:",
-#                 min = 20, max = 1000, value = 100, step = 20),
-#     actionButton("go", "Go"),
-#     plotOutput("plot")
-#     
-#     
-# )
+
 
 ui <- navbarPage("Fourier analysis",
     tabPanel("Piecewise functions",
-        textAreaInput("capt.func", "Insert expression for function f(t) here:", "function(t) t", width = "500px"),
-        numericInput("piece.range.from", "Piece range from:", -1),
-        numericInput("piece.range.to", "To:", 1),
+        textAreaInput("capt.func", "Insert expression for function f(t) here:", "function(t) ifelse(t<=-3, -t-3, ifelse(t>-3 & t<=0, t+3, ifelse(t>0 & t<=3, -2*t+3, t-6)))", width = "500px"),
+        numericInput("piece.range.from", "Piece range from:", -5),
+        numericInput("piece.range.to", "To:", 8),
         sliderInput("pieces", label = "Pieces:",
             min = -5, max = 5, value = c(-1,1), step = 1),
         sliderInput("resolution", label = "Graph resolution:",
             min = 20, max = 1000, value = 100, step = 20),
         actionButton("go", "Go"),
-        plotOutput("plot.pw")
+        plotOutput("plot.pw"),
+        downloadButton("DownloadPlotPW", "Download")
     ),
     tabPanel("Fourier series",
         numericInput("fs.a0", "a0:", 0),
@@ -78,7 +66,8 @@ ui <- navbarPage("Fourier analysis",
         sliderInput("fs.resolution", label = "Graph resolution:",
             min = 20, max = 1000, value = 100, step = 20),
         actionButton("fs.go", "Go"),
-        plotOutput("plot.fs")
+        plotOutput("plot.fs"),
+        downloadButton("DownloadPlotFS", "Download")
     )
 )
 
@@ -105,6 +94,24 @@ server <- function(input, output) {
     output$plot.fs <- renderPlot({
         fs.fncs()
     })
+    
+    output$DownloadPlotPW <- downloadHandler(
+      filename = function() {
+        paste("Plot.pw-", Sys.Date(), ".png", sep="")
+      },
+      content = function(file) {
+        ggsave(piecewise.fncs(), filename = file)
+      }
+    )
+    
+    output$DownloadPlotFS <- downloadHandler(
+      filename = function() {
+        paste("Plot.fs-", Sys.Date(), ".png", sep="")
+      },
+      content = function(file) {
+        ggsave(fs.fncs(), filename = file)
+      }
+    )
 }
 
 
