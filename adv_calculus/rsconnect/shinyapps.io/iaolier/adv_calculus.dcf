@@ -1,0 +1,12 @@
+name: adv_calculus
+title: adv_calculus
+username:
+account: iaolier
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1308720
+bundleId: 2485305
+url: https://iaolier.shinyapps.io/adv_calculus/
+when: 1570654353.82156
+asMultiple: FALSE
+asStatic: FALSE
